@@ -1,5 +1,6 @@
 package com.heyzqt.googletrainingdemo4;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,21 +12,30 @@ public class MainActivity extends AppCompatActivity {
 
 	private ImageView mImageView;
 
+	private Context mContext;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		mContext = this;
 		init();
 	}
 
 	private void init() {
 		mImageView = findViewById(R.id.imageview);
+
+		//test 1: show a picture through method decodeSampledBitmapFromResource()
 		//get a picture which width and height is near to 100px
-		mImageView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.img, 100, 100));
+		//mImageView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.img, 100, 100));
+
+		//test 2: show a picture through BitmapAsyncTask
+		BitmapAsyncTask bitmapAsyncTask = new BitmapAsyncTask(mContext, mImageView, 100, 100);
+		bitmapAsyncTask.execute(R.drawable.img);
 	}
 
-	private int calculateInSampleSize(BitmapFactory.Options opt, int reqWidth, int reqHeight) {
+	public static int calculateInSampleSize(BitmapFactory.Options opt, int reqWidth, int reqHeight) {
 		int inSampleSize = 1;
 		int width = opt.outWidth;
 		int height = opt.outHeight;
@@ -40,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 		return inSampleSize;
 	}
 
-	private Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
 			int reqWidth, int reqHeight) {
 		//get the dimensions of the picture
 		BitmapFactory.Options options = new BitmapFactory.Options();
