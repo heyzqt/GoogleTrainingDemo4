@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference;
 public class BitmapAsyncTask extends AsyncTask {
 
 	private final WeakReference mWeakReference;
-	private int data = 0;
+	public int data = 0;
 	private Context mContext;
 	private int reqWidth;
 	private int reqHeight;
