@@ -66,6 +66,10 @@ public class BitmapWorkerTask extends AsyncTask {
 	protected void onPostExecute(Object o) {
 		Log.i(TAG, "onPostExecute: ");
 		Bitmap bitmap = (Bitmap) o;
+		if (isCancelled()) {
+			bitmap = null;
+		}
+
 		if (bitmap != null && imageViewReference != null) {
 			final ImageView imageView = (ImageView) imageViewReference.get();
 			imageView.setImageBitmap(bitmap);
