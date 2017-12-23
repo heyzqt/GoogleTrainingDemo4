@@ -2,11 +2,17 @@ package com.heyzqt.googletrainingdemo4;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by heyzqt on 12/23/2017.
@@ -46,8 +52,9 @@ public class BitmapWorkerTask extends AsyncTask {
 	@Override
 	protected Object doInBackground(Object[] objects) {
 		if (objects[0] != null) {
-			return MainActivity.decodeSampledBitmapFromResource(mResources, (Integer) objects[0],
-					100, 100);
+			return getImageBitmap((String) objects[0]);
+//			return MainActivity.decodeSampledBitmapFromResource(mResources, (Integer) objects[0],
+//					100, 100);
 		}
 		return null;
 	}
@@ -61,6 +68,26 @@ public class BitmapWorkerTask extends AsyncTask {
 			imageView.setImageBitmap(bitmap);
 		}
 		super.onPostExecute(o);
+	}
 
+	public Bitmap getImageBitmap(String url) {
+		URL imgUrl = null;
+		Bitmap bitmap = null;
+		try {
+			imgUrl = new URL(url);
+			HttpURLConnection conn = (HttpURLConnection) imgUrl
+					.openConnection();
+			conn.setDoInput(true);
+			conn.connect();
+			InputStream is = conn.getInputStream();
+			bitmap = BitmapFactory.decodeStream(is);
+			is.close();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bitmap;
 	}
 }

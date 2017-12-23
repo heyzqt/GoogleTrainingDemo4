@@ -12,6 +12,11 @@ public class MainActivity extends AppCompatActivity {
 
 	private ImageView mImageView;
 
+	private final String imgUri =
+			"https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size"
+					+ "=b4000_4000&sec=1513997434&di=6338d79def0b9b9e8f57017685c7be90&src=http"
+					+ "://pic5.photophoto.cn/20071115/0034034460738987_b.jpg";
+
 	private static final String TAG = "MainActivity";
 
 	@Override
@@ -24,9 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private void init() {
 		mImageView = findViewById(R.id.imageview);
-
-		BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(getResources(), mImageView);
-		bitmapWorkerTask.execute(R.drawable.img);
+		loadBitmap();
 
 //		mImageView.setImageBitmap(setSuitableBitmap(getResources(), R.drawable.img,
 //				100, 100));
@@ -34,6 +37,21 @@ public class MainActivity extends AppCompatActivity {
 		//get a picture which width and height is near to 100px
 //		mImageView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.img,
 // 100, 100));
+	}
+
+	private void loadBitmap() {
+		// method one
+//		BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(getResources(), mImageView);
+//		bitmapWorkerTask.execute(R.drawable.img);
+
+		//method two
+		BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(getResources(), mImageView);
+		Bitmap placeHolderBitmap = BitmapFactory.decodeResource(getResources(),
+				R.mipmap.ic_launcher);
+		AsyncDrawble asyncDrawble = new AsyncDrawble(getResources(), placeHolderBitmap,
+				bitmapWorkerTask);
+		mImageView.setImageDrawable(asyncDrawble);
+		bitmapWorkerTask.execute(imgUri);
 	}
 
 	private Bitmap setSuitableBitmap(Resources res, int resId, int reqWidth, int reqHeight) {
