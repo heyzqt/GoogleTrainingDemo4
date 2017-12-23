@@ -24,9 +24,12 @@ public class MainActivity extends AppCompatActivity {
 
 	private void init() {
 		mImageView = findViewById(R.id.imageview);
-		mImageView.setImageBitmap(setSuitableBitmap(getResources(), R.drawable.img,
-				100, 100));
 
+		BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(getResources(), mImageView);
+		bitmapWorkerTask.execute(R.drawable.img);
+
+//		mImageView.setImageBitmap(setSuitableBitmap(getResources(), R.drawable.img,
+//				100, 100));
 
 		//get a picture which width and height is near to 100px
 //		mImageView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.img,
@@ -61,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
 		return sampleSize;
 	}
 
-	private int calculateInSampleSize(BitmapFactory.Options opt, int reqWidth, int reqHeight) {
+	private static int calculateInSampleSize(BitmapFactory.Options opt, int reqWidth,
+			int reqHeight) {
 		int inSampleSize = 1;
 		int width = opt.outWidth;
 		int height = opt.outHeight;
@@ -77,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 		return inSampleSize;
 	}
 
-	private Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
 			int reqWidth, int reqHeight) {
 		//get the dimensions of the picture
 		BitmapFactory.Options options = new BitmapFactory.Options();
