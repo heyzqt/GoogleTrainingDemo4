@@ -3,6 +3,7 @@ package com.heyzqt.googletrainingdemo4;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -45,13 +46,44 @@ public class MainActivity extends AppCompatActivity {
 //		bitmapWorkerTask.execute(R.drawable.img);
 
 		//method two
-		BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(getResources(), mImageView);
-		Bitmap placeHolderBitmap = BitmapFactory.decodeResource(getResources(),
-				R.mipmap.ic_launcher);
-		AsyncDrawble asyncDrawble = new AsyncDrawble(getResources(), placeHolderBitmap,
-				bitmapWorkerTask);
-		mImageView.setImageDrawable(asyncDrawble);
-		bitmapWorkerTask.execute(imgUri);
+		if (isBitmapWorkerTaskAllot(imgUri, mImageView)) {
+			BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(getResources(), mImageView);
+			Bitmap placeHolderBitmap = BitmapFactory.decodeResource(getResources(),
+					R.mipmap.ic_launcher);
+			AsyncDrawble asyncDrawble = new AsyncDrawble(getResources(), placeHolderBitmap,
+					bitmapWorkerTask);
+			mImageView.setImageDrawable(asyncDrawble);
+			bitmapWorkerTask.execute(imgUri);
+		}
+	}
+
+	//Check if the ImageView has already assigned with another BitmapWorkerTask
+	private boolean isBitmapWorkerTaskAllot(String uri, ImageView imageView) {
+		Log.i(TAG, "isBitmapWorkerTaskAllot: ");
+		BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
+
+		if (bitmapWorkerTask != null) {
+			final String bitmapData = bitmapWorkerTask.uri;
+			if (bitmapData.equals("") || !bitmapData.equals(uri)) {
+				//cancel previous task
+				bitmapWorkerTask.cancel(true);
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private BitmapWorkerTask getBitmapWorkerTask(ImageView imageView) {
+		if (imageView != null) {
+			final Drawable drawable = imageView.getDrawable();
+			if (drawable instanceof AsyncDrawble) {
+				Log.i(TAG, "getBitmapWorkerTask: drawable is a instance of AsyncDrawble");
+				final AsyncDrawble asyncDrawble = (AsyncDrawble) drawable;
+				return asyncDrawble.getBitmapworkerTask();
+			}
+		}
+		return null;
 	}
 
 	private Bitmap setSuitableBitmap(Resources res, int resId, int reqWidth, int reqHeight) {

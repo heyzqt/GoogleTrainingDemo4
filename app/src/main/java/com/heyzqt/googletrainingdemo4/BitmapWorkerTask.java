@@ -26,6 +26,8 @@ public class BitmapWorkerTask extends AsyncTask {
 
 	private final Resources mResources;
 
+	public String uri;
+
 	public BitmapWorkerTask(Resources res, ImageView imageView) {
 		imageViewReference = new WeakReference(imageView);
 		mResources = res;
@@ -51,6 +53,7 @@ public class BitmapWorkerTask extends AsyncTask {
 
 	@Override
 	protected Object doInBackground(Object[] objects) {
+		uri = (String) objects[0];
 		if (objects[0] != null) {
 			return getImageBitmap((String) objects[0]);
 //			return MainActivity.decodeSampledBitmapFromResource(mResources, (Integer) objects[0],
