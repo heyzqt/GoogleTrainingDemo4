@@ -7,11 +7,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.LruCache;
 import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
 
 	private ImageView mImageView;
+
+	private LruCache<String, Bitmap> mLruCache;
 
 	private final String imgUri =
 			"https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size"
@@ -30,7 +33,20 @@ public class MainActivity extends AppCompatActivity {
 
 	private void init() {
 		mImageView = findViewById(R.id.imageview);
-		loadBitmap();
+
+		// Use 1/8th of the available memory for this memory cache.
+		final int maxSizeMemory = (int) (Runtime.getRuntime().maxMemory() / 8);
+
+		mLruCache = new LruCache<String, Bitmap>(maxSizeMemory) {
+			@Override
+			protected int sizeOf(String key, Bitmap value) {
+				return value.getByteCount() / 1024;
+			}
+		};
+
+		loadBitmap(R.id.imageview, mImageView);
+
+		//loadBitmap();
 
 //		mImageView.setImageBitmap(setSuitableBitmap(getResources(), R.drawable.img,
 //				100, 100));
@@ -39,6 +55,31 @@ public class MainActivity extends AppCompatActivity {
 //		mImageView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.img,
 // 100, 100));
 	}
+
+	private void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+		if (getBitmapFromMemoryCache(key) == null) {
+			mLruCache.put(key, bitmap);
+		}
+	}
+
+	private Bitmap getBitmapFromMemoryCache(String key) {
+		return mLruCache.get(key);
+	}
+
+	private void loadBitmap(int resId, ImageView imageView) {
+		final String key = String.valueOf(resId);
+		Bitmap bitmap = getBitmapFromMemoryCache(key);
+
+		if (bitmap != null) {
+			imageView.setImageBitmap(bitmap);
+		} else {
+			imageView.setImageResource(R.mipmap.ic_launcher);
+			BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(getResources(), imageView);
+			bitmapWorkerTask.execute(resId);
+		}
+
+	}
+
 
 	private void loadBitmap() {
 		// method one
@@ -71,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
 				return false;
 			}
 		}
+
+		// No task associater with the Imageview or an existing task was cancelled
 		return true;
 	}
 
